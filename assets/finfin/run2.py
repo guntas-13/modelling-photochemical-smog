@@ -86,6 +86,24 @@ def model1_odes(C, t):
     
     return [dNO_dt, dNO2_dt, dO3_dt, dO_dt]
 
+###################################################################################
+def model1_odes_1(y, t):
+    """
+    Model 1: Three-species photochemical cycle (NO, NO2, O3).
+    """
+    NO, NO2, O3 = y
+    
+    # Time-dependent photolysis rate
+    k1 = solar_intensity(t)
+    
+    # Differential equations
+    dNO_dt = k1 * NO2 - k3 * NO * O3 + E_NO_m1
+    dNO2_dt = -k1 * NO2 + k3 * NO * O3 + E_NO2_m1
+    dO3_dt = k1 * NO2 - k3 * NO * O3
+    
+    return [dNO_dt, dNO2_dt, dO3_dt]
+###################################################################################
+
 # Solve Model 1
 print("="*70)
 print("MODEL 1: BASIC PHOTOCHEMICAL CYCLE")
@@ -94,16 +112,27 @@ print("="*70)
 C0_m1 = [0.1, 0.05, 0.0, 0.0]  # [NO, NO2, O3, O]
 t_span = np.linspace(0, 19, 2000)  # 5:00 AM to midnight
 
+###################################################################################
 sol_m1 = odeint(model1_odes, C0_m1, t_span)
+sol_m1_1 = odeint(model1_odes_1, C0_m1[:3], t_span)
+###################################################################################
 NO_m1 = sol_m1[:, 0]
 NO2_m1 = sol_m1[:, 1]
 O3_m1 = sol_m1[:, 2]
+NO_m1_1 = sol_m1_1[:, 0]
+NO2_m1_1 = sol_m1_1[:, 1]
+O3_m1_1 = sol_m1_1[:, 2]
+###################################################################################
 O_m1 = sol_m1[:, 3]
+###################################################################################
 t_clock = t_span + 5
 
 print(f"Peak O3: {O3_m1.max():.6f} ppm at {t_clock[O3_m1.argmax()]:.1f}:00")
 print(f"Peak NO2: {NO2_m1.max():.4f} ppm")
 print(f"Min NO: {NO_m1.min():.4f} ppm")
+print(f"Peak O3 (1): {O3_m1_1.max():.6f} ppm at {t_clock[O3_m1_1.argmax()]:.1f}:00")
+print(f"Peak NO2 (1): {NO2_m1_1.max():.4f} ppm")
+print(f"Min NO (1): {NO_m1_1.min():.4f} ppm")
 
 # ============================================================================
 # MODEL 2: REFINED WITH VOCs
@@ -215,7 +244,7 @@ RO2_m2 = sol_m2[:, 10]
 print(f"Peak O3: {O3_m2.max():.6f} ppm at {t_clock[O3_m2.argmax()]:.1f}:00")
 print(f"Peak OH: {OH_m2.max():.2e} ppm")
 print(f"Peak HO2: {HO2_m2.max():.2e} ppm")
-print(f"Enhancement factor: {O3_m2.max()/O3_m1.max():.1f}×")
+print(f"Enhancement factor: {O3_m2.max()/O3_m1.max():.1f}x")
 
 # ============================================================================
 # FIGURE 1: MODEL 1 RESULTS
@@ -251,10 +280,10 @@ ax2.set_xlim(5, 24)
 
 # Plot 3: Atomic Oxygen
 ax3 = fig1.add_subplot(gs1[1, 0])
-ax3.plot(t_clock, O_m1 * 1e6, 'm-', linewidth=2.5)
+ax3.plot(t_clock, O_m1, 'm-', linewidth=2.5)
 add_daylight_shading(ax3)
 ax3.set_xlabel('Time (hours)', fontweight='bold')
-ax3.set_ylabel(r'Concentration (ppm $\times$ 10$^6$)', fontweight='bold')
+ax3.set_ylabel(r'Concentration (ppm)', fontweight='bold')
 ax3.set_title('(c) Reactive Intermediate: Atomic Oxygen (O)', fontweight='bold')
 ax3.grid(alpha=0.3)
 ax3.set_xlim(5, 24)
@@ -276,6 +305,53 @@ ax4.set_ylim(0, 1.1)
 fig1.suptitle('Model 1: Basic Photochemical Cycle', fontsize=14, fontweight='bold')
 plt.savefig('model1_results.pdf', dpi=300, bbox_inches='tight')
 print("\n✓ Saved: model1_results.pdf")
+plt.show()
+
+fig1 = plt.figure(figsize=(14, 10))
+gs1 = GridSpec(2, 2, figure=fig1, hspace=0.3, wspace=0.3)
+
+# Plot 1: NO and NO2
+ax1 = fig1.add_subplot(gs1[0, 0])
+ax1.plot(t_clock, NO_m1_1, color=COLORS['NO'], linewidth=2.5, label='NO')
+ax1.plot(t_clock, NO2_m1_1, color=COLORS['NO2'], linewidth=2.5, label=r'NO$_2$')
+add_daylight_shading(ax1)
+ax1.set_xlabel('Time (hours)', fontweight='bold')
+ax1.set_ylabel('Concentration (ppm)', fontweight='bold')
+ax1.set_title(r'(a) Primary Pollutants: NO and NO$_2$', fontweight='bold')
+ax1.legend(framealpha=0.9)
+ax1.grid(alpha=0.3)
+ax1.set_xlim(5, 24)
+
+# Plot 2: Ozone
+ax2 = fig1.add_subplot(gs1[0, 1])
+ax2.plot(t_clock, O3_m1_1, color=COLORS['O3'], linewidth=3)
+ax2.fill_between(t_clock, 0, O3_m1_1, color=COLORS['O3'], alpha=0.2)
+add_daylight_shading(ax2)
+peak_idx = O3_m1_1.argmax()
+ax2.plot(t_clock[peak_idx], O3_m1_1[peak_idx], 'r*', markersize=15)
+ax2.set_xlabel('Time (hours)', fontweight='bold')
+ax2.set_ylabel('Concentration (ppm)', fontweight='bold')
+ax2.set_title(r'(b) Secondary Pollutant: Ozone (O$_3$)', fontweight='bold')
+ax2.grid(alpha=0.3)
+ax2.set_xlim(5, 24)
+
+# Plot 3: Normalized comparison
+ax3 = fig1.add_subplot(gs1[1, :])
+ax3.plot(t_clock, NO_m1_1, color=COLORS['NO'], linewidth=2, label='NO')
+ax3.plot(t_clock, NO2_m1_1, color=COLORS['NO2'], linewidth=2, label=r'NO$_2$')
+ax3.plot(t_clock, O3_m1_1, color=COLORS['O3'], linewidth=2, label=r'O$_3$')
+add_daylight_shading(ax3)
+ax3.set_xlabel('Time (hours)', fontweight='bold')
+ax3.set_ylabel('Concentration', fontweight='bold')
+ax3.set_title('(c) Comparative Dynamics', fontweight='bold')
+ax3.legend(framealpha=0.9)
+ax3.grid(alpha=0.3)
+ax3.set_xlim(5, 24)
+# ax3.set_ylim(0, 1.1)
+
+fig1.suptitle('Model 1: Basic Photochemical Cycle', fontsize=14, fontweight='bold')
+plt.savefig('model1_results_1.pdf', dpi=300, bbox_inches='tight')
+print("\n✓ Saved: model1_results_1.pdf")
 plt.show()
 
 # ============================================================================
