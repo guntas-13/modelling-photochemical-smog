@@ -7,6 +7,8 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
+from latex import latexify
+latexify(columns=2)
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -14,13 +16,14 @@ warnings.filterwarnings('ignore')
 plt.style.use('seaborn-v0_8-whitegrid')
 plt.rcParams['figure.dpi'] = 100
 plt.rcParams['savefig.dpi'] = 300
-plt.rcParams['font.size'] = 10
+plt.rcParams['font.size'] = 13
 plt.rcParams['font.family'] = 'serif'
-plt.rcParams['axes.labelsize'] = 11
-plt.rcParams['axes.titlesize'] = 12
-plt.rcParams['xtick.labelsize'] = 9
-plt.rcParams['ytick.labelsize'] = 9
-plt.rcParams['legend.fontsize'] = 9
+plt.rcParams['axes.labelsize'] = 12
+plt.rcParams['axes.titlesize'] = 14
+plt.rcParams['xtick.labelsize'] = 11
+plt.rcParams['ytick.labelsize'] = 11
+plt.rcParams['legend.fontsize'] = 11
+plt.rcParams['figure.titlesize'] = 16
 
 # Colors
 COLORS = {
@@ -225,11 +228,11 @@ gs1 = GridSpec(2, 2, figure=fig1, hspace=0.3, wspace=0.3)
 # Plot 1: NO and NO2
 ax1 = fig1.add_subplot(gs1[0, 0])
 ax1.plot(t_clock, NO_m1, color=COLORS['NO'], linewidth=2.5, label='NO')
-ax1.plot(t_clock, NO2_m1, color=COLORS['NO2'], linewidth=2.5, label='NO₂')
+ax1.plot(t_clock, NO2_m1, color=COLORS['NO2'], linewidth=2.5, label=r'NO$_2$')
 add_daylight_shading(ax1)
 ax1.set_xlabel('Time (hours)', fontweight='bold')
 ax1.set_ylabel('Concentration (ppm)', fontweight='bold')
-ax1.set_title('(a) Primary Pollutants: NO and NO₂', fontweight='bold')
+ax1.set_title(r'(a) Primary Pollutants: NO and NO$_2$', fontweight='bold')
 ax1.legend(framealpha=0.9)
 ax1.grid(alpha=0.3)
 ax1.set_xlim(5, 24)
@@ -243,7 +246,7 @@ peak_idx = O3_m1.argmax()
 ax2.plot(t_clock[peak_idx], O3_m1[peak_idx], 'r*', markersize=15)
 ax2.set_xlabel('Time (hours)', fontweight='bold')
 ax2.set_ylabel('Concentration (ppm)', fontweight='bold')
-ax2.set_title('(b) Secondary Pollutant: Ozone (O₃)', fontweight='bold')
+ax2.set_title(r'(b) Secondary Pollutant: Ozone (O$_3$)', fontweight='bold')
 ax2.grid(alpha=0.3)
 ax2.set_xlim(5, 24)
 
@@ -252,7 +255,7 @@ ax3 = fig1.add_subplot(gs1[1, 0])
 ax3.plot(t_clock, O_m1 * 1e6, 'm-', linewidth=2.5)
 add_daylight_shading(ax3)
 ax3.set_xlabel('Time (hours)', fontweight='bold')
-ax3.set_ylabel('Concentration (ppm × 10⁶)', fontweight='bold')
+ax3.set_ylabel(r'Concentration (ppm $\times$ 10$^6$)', fontweight='bold')
 ax3.set_title('(c) Reactive Intermediate: Atomic Oxygen (O)', fontweight='bold')
 ax3.grid(alpha=0.3)
 ax3.set_xlim(5, 24)
@@ -260,8 +263,8 @@ ax3.set_xlim(5, 24)
 # Plot 4: Normalized comparison
 ax4 = fig1.add_subplot(gs1[1, 1])
 ax4.plot(t_clock, NO_m1/NO_m1.max(), color=COLORS['NO'], linewidth=2, label='NO')
-ax4.plot(t_clock, NO2_m1/NO2_m1.max(), color=COLORS['NO2'], linewidth=2, label='NO₂')
-ax4.plot(t_clock, O3_m1/O3_m1.max(), color=COLORS['O3'], linewidth=2, label='O₃')
+ax4.plot(t_clock, NO2_m1/NO2_m1.max(), color=COLORS['NO2'], linewidth=2, label=r'NO$_2$')
+ax4.plot(t_clock, O3_m1/O3_m1.max(), color=COLORS['O3'], linewidth=2, label=r'O$_3$')
 add_daylight_shading(ax4)
 ax4.set_xlabel('Time (hours)', fontweight='bold')
 ax4.set_ylabel('Normalized Concentration', fontweight='bold')
@@ -272,8 +275,8 @@ ax4.set_xlim(5, 24)
 ax4.set_ylim(0, 1.1)
 
 fig1.suptitle('Model 1: Basic Photochemical Cycle', fontsize=14, fontweight='bold')
-plt.savefig('model1_results.png', dpi=300, bbox_inches='tight')
-print("\n✓ Saved: model1_results.png")
+plt.savefig('model1_results.pdf', dpi=300, bbox_inches='tight')
+print("\n✓ Saved: model1_results.pdf")
 plt.show()
 
 # ============================================================================
@@ -299,7 +302,7 @@ ax1.set_xlim(5, 24)
 # Plot 2: NO and NO2
 ax2 = fig2.add_subplot(gs2[0, 1])
 ax2.plot(t_clock, NO_m2, color=COLORS['NO'], linewidth=2.5, label='NO')
-ax2.plot(t_clock, NO2_m2, color=COLORS['NO2'], linewidth=2.5, label='NO₂')
+ax2.plot(t_clock, NO2_m2, color=COLORS['NO2'], linewidth=2.5, label=r'NO$_2$')
 add_daylight_shading(ax2)
 ax2.set_xlabel('Time (hours)', fontweight='bold')
 ax2.set_ylabel('Concentration (ppm)', fontweight='bold')
@@ -310,9 +313,9 @@ ax2.set_xlim(5, 24)
 
 # Plot 3: Radicals
 ax3 = fig2.add_subplot(gs2[0, 2])
-ax3.plot(t_clock, OH_m2*1e6, color=COLORS['OH'], linewidth=2, label='OH (×10⁶)')
-ax3.plot(t_clock, HO2_m2*1e3, color=COLORS['HO2'], linewidth=2, label='HO₂ (×10³)')
-ax3.plot(t_clock, RO2_m2*1e3, color=COLORS['RO2'], linewidth=2, label='RO₂ (×10³)')
+ax3.plot(t_clock, OH_m2*1e6, color=COLORS['OH'], linewidth=2, label=r'OH ($\times 10^6$)')
+ax3.plot(t_clock, HO2_m2*1e3, color=COLORS['HO2'], linewidth=2, label=r'HO$_2$ ($\times 10^3$)')
+ax3.plot(t_clock, RO2_m2*1e3, color=COLORS['RO2'], linewidth=2, label=r'RO$_2$ ($\times 10^3$)')
 add_daylight_shading(ax3)
 ax3.set_xlabel('Time (hours)', fontweight='bold')
 ax3.set_ylabel('Scaled Concentration', fontweight='bold')
@@ -350,13 +353,13 @@ ax6 = fig2.add_subplot(gs2[1, 2])
 rate_O3 = k3_m2 * O3_m2 * NO_m2
 rate_HO2 = k12 * HO2_m2 * NO_m2
 rate_RO2 = k13 * RO2_m2 * NO_m2
-ax6.plot(t_clock, rate_O3, 'g--', linewidth=2, label='O₃ + NO', alpha=0.7)
-ax6.plot(t_clock, rate_HO2, color=COLORS['HO2'], linewidth=2, label='HO₂ + NO')
-ax6.plot(t_clock, rate_RO2, color=COLORS['RO2'], linewidth=2, label='RO₂ + NO')
+ax6.plot(t_clock, rate_O3, 'g--', linewidth=2, label=r'O$_3$ + NO', alpha=0.7)
+ax6.plot(t_clock, rate_HO2, color=COLORS['HO2'], linewidth=2, label=r'HO$_2$ + NO')
+ax6.plot(t_clock, rate_RO2, color=COLORS['RO2'], linewidth=2, label=r'RO$_2$ + NO')
 add_daylight_shading(ax6)
 ax6.set_xlabel('Time (hours)', fontweight='bold')
 ax6.set_ylabel('Rate (ppm/h)', fontweight='bold')
-ax6.set_title('(f) NO → NO₂ Pathways', fontweight='bold')
+ax6.set_title(r'(f) NO $\to$ NO$_2$ Pathways', fontweight='bold')
 ax6.legend()
 ax6.grid(alpha=0.3)
 ax6.set_xlim(5, 24)
@@ -364,13 +367,13 @@ ax6.set_xlim(5, 24)
 # Plot 7: NOx budget
 ax7 = fig2.add_subplot(gs2[2, 0])
 NOx_m2 = NO_m2 + NO2_m2
-ax7.plot(t_clock, NOx_m2, 'darkred', linewidth=3, label='NOₓ (NO + NO₂)')
+ax7.plot(t_clock, NOx_m2, 'darkred', linewidth=3, label=r'NO$_x$ (NO + NO$_2$)')
 ax7.plot(t_clock, NO_m2, color=COLORS['NO'], linewidth=1.5, linestyle='--', alpha=0.6)
 ax7.plot(t_clock, NO2_m2, color=COLORS['NO2'], linewidth=1.5, linestyle='--', alpha=0.6)
 add_daylight_shading(ax7)
 ax7.set_xlabel('Time (hours)', fontweight='bold')
 ax7.set_ylabel('Concentration (ppm)', fontweight='bold')
-ax7.set_title('(g) NOₓ Budget', fontweight='bold')
+ax7.set_title(r'(g) NO$_x$ Budget', fontweight='bold')
 ax7.legend()
 ax7.grid(alpha=0.3)
 ax7.set_xlim(5, 24)
@@ -382,7 +385,7 @@ ax8.plot(t_clock, Ox, 'darkblue', linewidth=3)
 add_daylight_shading(ax8)
 ax8.set_xlabel('Time (hours)', fontweight='bold')
 ax8.set_ylabel('Concentration (ppm)', fontweight='bold')
-ax8.set_title('(h) Oxidant Capacity (Oₓ)', fontweight='bold')
+ax8.set_title(r'(h) Oxidant Capacity (O$_x$)', fontweight='bold')
 ax8.grid(alpha=0.3)
 ax8.set_xlim(5, 24)
 
@@ -394,14 +397,14 @@ ax9.plot(t_clock, ratio, 'purple', linewidth=2.5)
 add_daylight_shading(ax9)
 ax9.set_xlabel('Time (hours)', fontweight='bold')
 ax9.set_ylabel('Ratio', fontweight='bold')
-ax9.set_title('(i) NO/NO₂ Ratio', fontweight='bold')
+ax9.set_title(r'(i) NO/NO$_2$ Ratio', fontweight='bold')
 ax9.grid(alpha=0.3)
 ax9.set_xlim(5, 24)
 ax9.set_ylim(0, 5)
 
 fig2.suptitle('Model 2: Refined with VOCs and Radicals', fontsize=14, fontweight='bold')
-plt.savefig('model2_results.png', dpi=300, bbox_inches='tight')
-print("✓ Saved: model2_results.png")
+plt.savefig('model2_results.pdf', dpi=300, bbox_inches='tight')
+print("✓ Saved: model2_results.pdf")
 plt.show()
 
 # ============================================================================
@@ -417,7 +420,7 @@ ax1.plot(t_clock, O3_m1, 'g--', linewidth=3, label='Model 1 (No VOCs)', alpha=0.
 ax1.plot(t_clock, O3_m2, 'g-', linewidth=3, label='Model 2 (With VOCs)')
 add_daylight_shading(ax1)
 ax1.set_xlabel('Time (hours)', fontweight='bold')
-ax1.set_ylabel('O₃ Concentration (ppm)', fontweight='bold')
+ax1.set_ylabel(r'O$_3$ Concentration (ppm)', fontweight='bold')
 ax1.set_title('(a) Ozone: Model Comparison', fontweight='bold')
 ax1.legend(framealpha=0.9)
 ax1.grid(alpha=0.3)
@@ -441,16 +444,16 @@ ax3.plot(t_clock, NO2_m1, 'r--', linewidth=2.5, label='Model 1', alpha=0.7)
 ax3.plot(t_clock, NO2_m2, 'r-', linewidth=2.5, label='Model 2')
 add_daylight_shading(ax3)
 ax3.set_xlabel('Time (hours)', fontweight='bold')
-ax3.set_ylabel('NO₂ Concentration (ppm)', fontweight='bold')
-ax3.set_title('(c) NO₂: Model Comparison', fontweight='bold')
+ax3.set_ylabel(r'NO$_2$ Concentration (ppm)', fontweight='bold')
+ax3.set_title(r'(c) NO$_2$: Model Comparison', fontweight='bold')
 ax3.legend(framealpha=0.9)
 ax3.grid(alpha=0.3)
 ax3.set_xlim(5, 24)
 
 fig3.suptitle('Model Comparison: Impact of VOCs on Ozone Formation', 
              fontsize=14, fontweight='bold')
-plt.savefig('comparison_models.png', dpi=300, bbox_inches='tight')
-print("✓ Saved: comparison_models.png")
+plt.savefig('comparison_models.pdf', dpi=300, bbox_inches='tight')
+print("✓ Saved: comparison_models.pdf")
 plt.show()
 
 # ============================================================================
