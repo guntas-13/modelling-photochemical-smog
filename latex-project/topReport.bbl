@@ -1,0 +1,100 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{5}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{}, \showDOI{}, and \showURL{}.  The latter two
+%%% do not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showDOI}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showDOI #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showDOI      \undefined \def \showDOI       #1{#1}\fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
+
+\bibitem[Bazzell and Peters(1981)]%
+        {BAZZELL1981957}
+\bibfield{author}{\bibinfo{person}{Catherine~C. Bazzell} {and} \bibinfo{person}{Leonard~K. Peters}.} \bibinfo{year}{1981}\natexlab{}.
+\newblock \showarticletitle{The transport of photochemical pollutants to the background troposphere}.
+\newblock \bibinfo{journal}{\emph{Atmospheric Environment (1967)}} \bibinfo{volume}{15}, \bibinfo{number}{6} (\bibinfo{year}{1981}), \bibinfo{pages}{957--968}.
+\newblock
+\showISSN{0004-6981}
+\urldef\tempurl%
+\url{https://doi.org/10.1016/0004-6981(81)90096-2}
+\showDOI{\tempurl}
+
+
+\bibitem[Carrasco-Venegas et~al\mbox{.}(2025)]%
+        {pr13051384}
+\bibfield{author}{\bibinfo{person}{Luis~Américo Carrasco-Venegas}, \bibinfo{person}{Luz~Genara Castañeda-Pérez}, \bibinfo{person}{Daril~Giovanni Martínez-Hilario}, \bibinfo{person}{Juan~Taumaturgo Medina-Collana}, \bibinfo{person}{José~Vulfrano González-Fernández}, \bibinfo{person}{Cesar Gutiérrez-Cuba}, \bibinfo{person}{Héctor~Ricardo Cuba-Torre}, \bibinfo{person}{Alex Pilco-Nuñez}, \bibinfo{person}{Carlos~Alejandro Ancieta-Dextre}, {and} \bibinfo{person}{Oscar~Juan Rodriguez-Taranco}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Mathematical Modeling of Photochemical and Chemical Interactions in Photochemical Smog Formation}.
+\newblock \bibinfo{journal}{\emph{Processes}} \bibinfo{volume}{13}, \bibinfo{number}{5} (\bibinfo{year}{2025}).
+\newblock
+\showISSN{2227-9717}
+\urldef\tempurl%
+\url{https://doi.org/10.3390/pr13051384}
+\showDOI{\tempurl}
+
+
+\bibitem[Duc et~al\mbox{.}(2002)]%
+        {book}
+\bibfield{author}{\bibinfo{person}{Hiep Duc}, \bibinfo{person}{Võ Anh}, {and} \bibinfo{person}{Merched Azzi}.} \bibinfo{year}{2002}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Modelling of Photochemical Smog}}.
+\newblock \bibinfo{pages}{pp 361--382}.
+\newblock
+\showISBNx{978-3-642-08685-4}
+\urldef\tempurl%
+\url{https://doi.org/10.1007/978-3-662-04868-9_10}
+\showDOI{\tempurl}
+
+
+\bibitem[Falls et~al\mbox{.}(1979)]%
+        {https://doi.org/10.1002/kin.550111102}
+\bibfield{author}{\bibinfo{person}{Andrew~H. Falls}, \bibinfo{person}{Gregory~J. McRae}, {and} \bibinfo{person}{John~H. Seinfeld}.} \bibinfo{year}{1979}\natexlab{}.
+\newblock \showarticletitle{Sensitivity and uncertainty of reaction mechanisms for photochemical air pollution}.
+\newblock \bibinfo{journal}{\emph{International Journal of Chemical Kinetics}} \bibinfo{volume}{11}, \bibinfo{number}{11} (\bibinfo{year}{1979}), \bibinfo{pages}{1137--1162}.
+\newblock
+\urldef\tempurl%
+\url{https://doi.org/10.1002/kin.550111102}
+\showDOI{\tempurl}
+\showeprint{https://onlinelibrary.wiley.com/doi/pdf/10.1002/kin.550111102}
+
+
+\bibitem[McRae et~al\mbox{.}(1982)]%
+        {MCRAE19821}
+\bibfield{author}{\bibinfo{person}{Gregory~J McRae}, \bibinfo{person}{William~R Goodin}, {and} \bibinfo{person}{John~H Seinfeld}.} \bibinfo{year}{1982}\natexlab{}.
+\newblock \showarticletitle{Numerical solution of the atmospheric diffusion equation for chemically reacting flows}.
+\newblock \bibinfo{journal}{\emph{J. Comput. Phys.}} \bibinfo{volume}{45}, \bibinfo{number}{1} (\bibinfo{year}{1982}), \bibinfo{pages}{1--42}.
+\newblock
+\showISSN{0021-9991}
+\urldef\tempurl%
+\url{https://doi.org/10.1016/0021-9991(82)90101-2}
+\showDOI{\tempurl}
+
+
+\end{thebibliography}
