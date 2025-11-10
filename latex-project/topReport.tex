@@ -1,0 +1,282 @@
+\documentclass[a4paper,11pt,oneside]{report}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{subcaption}
+\usepackage{latexsym}
+\usepackage{listings}
+\usepackage{cappar}
+\usepackage{amssymb}
+\usepackage{lipsum}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage[english]{babel}
+\usepackage[biblabel]{cite}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{esint}
+\usepackage{siunitx}
+\usepackage{makecell}
+\usepackage{array}
+\usepackage{longtable}
+
+%\usepackage{arabtex}
+\usepackage{lettrine}
+\usepackage[T1]{fontenc}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+%\usepackage[latin1]{inputenc}
+
+%% CHANGE FONT TYPEFACE HERE
+% \usepackage{palatino}
+\usepackage{mlmodern}
+% \usepackage{courier}
+%\usepackage{eufrack}
+%\usepackage{epsf}
+\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{mathtools}
+%\pagestyle{headings}
+%------------la profondeur du document
+   %% Visibles dans la table des matieres
+%-------------------------------------------
+\setlength{\doublerulesep}{\arrayrulewidth}
+\setlength{\textwidth}{16cm} \setlength{\textheight}{24cm}
+\setlength{\marginparwidth}{-4cm} \setlength{\evensidemargin}{-4cm}
+\setlength{\hoffset}{-1.7cm} \setlength{\voffset}{-1cm}
+\setlength{\topmargin}{-0.5cm} \setlength{\footskip}{27pt}
+%\addtolength{\footsep}{1cm}
+
+\renewcommand{\baselinestretch}{1.3}
+\linespread{1}
+
+\usepackage{titlesec}
+\titlespacing*{\chapter}{0pt}{-1\baselineskip}{1\baselineskip}
+\titlespacing*{\section}{0pt}{\baselineskip}{0pt} 
+
+\usepackage{fancyhdr}
+\usepackage{nccrules}
+\usepackage{titlesec}
+\usepackage{verbatim}
+\usepackage{supertabular}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{float}
+\usepackage[shortlabels]{enumitem}
+\usepackage{accents}
+\usepackage{pifont}
+\usepackage{url}
+
+% -- Defining colors:
+\usepackage[dvipsnames]{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.45,0.45,0.45}
+\definecolor{iitgn-blue}{RGB}{73,153,212}
+
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  urlcolor     = iitgn-blue, %Colour for external hyperlinks
+  linkcolor    = iitgn-blue, %Colour of internal links
+  citecolor   = red %Colour of citations
+}
+
+% Definig a custom style:
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codepurple},
+    keywordstyle=\color{NavyBlue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize\bfseries,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=t,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+% -- Setting up the custom style:
+\lstset{
+  style=mystyle,
+  framexleftmargin=3.5mm,
+  frame=shadowbox,
+  rulesepcolor=\color{black},
+  linewidth=\linewidth,
+  xleftmargin=12pt,
+  aboveskip=12pt,
+  belowskip=12pt
+}
+\definecolor{vgreen}{RGB}{54,120,84}
+\definecolor{vblue}{RGB}{49,49,255}
+\definecolor{vorange}{RGB}{255,143,102}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+
+\lstdefinestyle{python-style}
+{
+    language=Python,
+    backgroundcolor=\color{backcolour},
+    basicstyle=\small\fontfamily{pcr}\bfseries,
+    keywordstyle=\color{NavyBlue},
+    identifierstyle=\color{black},
+    commentstyle=\color{codepurple},
+    stringstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    numbers=left,                    
+    numbersep=5pt,
+    tabsize=8,
+    moredelim=*[s][\colorIndex]{[}{]},
+    literate=*{:}{:}1
+}
+
+\lstset{
+  style=python-style,
+  framexleftmargin=3.5mm,
+  frame=shadowbox,
+  rulesepcolor=\color{black},
+  linewidth=\linewidth,
+  xleftmargin=12pt,
+  aboveskip=12pt,
+  belowskip=12pt,
+  float=H
+}
+
+% \lstdefinestyle{cpp-style}
+% {
+%     language=C++,
+%     backgroundcolor=\color{backcolour},
+%     basicstyle=\small\fontfamily{pcr}\bfseries,
+%     keywordstyle=\color{NavyBlue},
+%     identifierstyle=\color{black},
+%     commentstyle=\color{codepurple},
+%     stringstyle=\color{vgreen},
+%     numberstyle=\tiny\color{codegray},
+%     numbers=left,                    
+%     numbersep=5pt,
+%     tabsize=8,
+%     moredelim=*[s][\colorIndex]{[}{]},
+%     literate=*{:}{:}1
+% }
+
+% \lstset{
+%   style=cpp-style,
+%   framexleftmargin=3.5mm,
+%   frame=shadowbox,
+%   rulesepcolor=\color{black},
+%   linewidth=\linewidth,
+%   xleftmargin=12pt,
+%   aboveskip=12pt,
+%   belowskip=12pt,
+%   float=H
+% }
+
+% \lstdefinestyle{bash-style}
+% {
+%     language=sh,
+%     backgroundcolor=\color{backcolour},
+%     basicstyle=\small\fontfamily{pcr}\bfseries,
+%     keywordstyle=\color{PineGreen},
+%     identifierstyle=\color{black},
+%     commentstyle=\color{codepurple},
+%     numberstyle=\tiny\color{NavyBlue},
+%     numbers=left,                    
+%     numbersep=5pt,
+%     tabsize=8,
+%     moredelim=*[s][\colorIndex]{[}{]},
+%     literate=*{:}{:}1
+% }
+
+% \lstset{
+%   style=bash-style,
+%   framexleftmargin=3.5mm,
+%   frame=shadowbox,
+%   rulesepcolor=\color{black},
+%   linewidth=\linewidth,
+%   xleftmargin=12pt,
+%   aboveskip=12pt,
+%   belowskip=12pt,
+%   morekeywords={gcc,g++,ssh,iperf3,sudo,mininet,bandit,conda,pip3, python3, mkdir, bash, chmod, pytest, pynguin} ,
+%   otherkeywords={gcc,g++,ssh,iperf3,sudo,mininet,bandit,conda,pip3, python3, mkdir, bash, chmod, pytest, pynguin},
+%   float=H
+% }
+
+\makeatletter
+\newcommand*\@lbracket{[}
+\newcommand*\@rbracket{]}
+\newcommand*\@colon{:}
+\newcommand*\colorIndex{%
+    \edef\@temp{\the\lst@token}%
+    \ifx\@temp\@lbracket \color{black}%
+    \else\ifx\@temp\@rbracket \color{black}%
+    \else\ifx\@temp\@colon \color{black}%
+    \else \color{vorange}%
+    \fi\fi\fi
+}
+\makeatother
+
+% Important Table commands! %
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\newcolumntype{N}{@{}m{0pt}@{}}
+
+\fancypagestyle{noheadrule}{
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.5pt}
+ \fancyfoot[LE,LO]{\textit {}}
+ \fancyfoot[RE,RO]{\bfseries\thepage}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\thispagestyle{empty}
+\input{frontPage.tex}
+
+\pagenumbering{roman} \setcounter{page}{1}
+
+\setcounter{secnumdepth}{11}
+\setcounter{tocdepth}{3}
+
+\renewcommand{\chaptermark}[1]{\markboth{Chapter ~\thechapter~:~#1}{}}
+
+\fancyhf{}
+
+\fancyhead[LE,LO]{\includegraphics[height = 23pt]{IITGN.png}}
+\fancyhead[RE,RO]{\bfseries\leftmark EH605: MESS}
+\fancyfoot[LE,LO]{Project Report} 
+\fancyfoot[RE,RO]{\bfseries\thepage}
+
+
+\fancypagestyle{plain}{
+\fancyhead{}
+\renewcommand{\headrulewidth}{0pt}
+} \pagestyle{fancy}
+
+\selectlanguage{english}
+
+% {\linespread{.8}\tableofcontents}
+% \newpage
+
+
+
+\pagenumbering{arabic}
+\titlespacing{\chapter}{0cm}{1cm}{2cm}
+
+\input{chap1.tex}
+\nocite{pr13051384,book,https://doi.org/10.1002/kin.550111102,MCRAE19821}
+
+\bibliography{biblio}
+\bibliographystyle{ACM-Reference-Format}
+
+\end{document} 

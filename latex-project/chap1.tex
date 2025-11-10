@@ -1,0 +1,749 @@
+\section*{Abstract}
+Photochemical smog forms through complex interactions between nitrogen oxides (NO$_x$), volatile organic compounds (VOCs), and sunlight. In this project, I develop two mathematical models of increasing complexity: Model 1 captures the basic NO-NO$_2$-O$_3$ photochemical cycle with 4 species and 5 reactions, while Model 2 extends to 11 species and 15 reactions, incorporating VOC oxidation and radical chemistry. Solving the equations numerically, it is demonstrates that Model 1 produces minimal ozone ($\sim 2 \times 10^{-3}$ ppb peak) due to rapid titration by NO, while Model 2 achieves realistic ozone levels (order of $\sim$0.1$\times$ ppm) through radical-mediated NO oxidation pathways. The enhancement factor highlights the critical role of VOCs and radicals in urban photochemical smog formation. Several studies from 80s have beautifully produced models for the same involving a large number of species \cite{BAZZELL1981957,MCRAE19821,https://doi.org/10.1002/kin.550111102}. The chapter \textit{``Modelling of Photochemical Smog''} from the book ``Environment Modelling and Pollution''\cite{book} aims to lump various species into a 7-reaction Generic Reaction Set (GRS); although their model is interpretable and easy to follow, I could not fetch parametric values for their system (this is briefly touched upon in the Appendix). Finally, I resorted to a detailed study by \cite{pr13051384} that provided me with all the required reactions and parameters.
+
+\section*{Introduction}
+
+Photochemical smog, first documented in Los Angeles in the 1940s \cite{BAZZELL1981957,MCRAE19821,https://doi.org/10.1002/kin.550111102}, remains a persistent urban air quality challenge. Unlike traditional industrial smog, photochemical smog arises from sunlight-driven reactions involving:
+
+\begin{itemize}
+    \item \textbf{Primary pollutants:} NO$_x$ (from combustion), VOCs (from vehicles, solvents)
+    \item \textbf{Solar radiation:} Provides photochemical energy
+    \item \textbf{Secondary pollutants:} Ozone (O$_3$), aldehydes, PAN
+\end{itemize}
+Ground-level ozone concentrations exceeding 0.07 ppm cause respiratory problems, crop damage, and ecosystem degradation. Understanding the chemical mechanisms is essential for developing effective control strategies.
+
+\subsection*{Objectives}
+Develops two models, state the variables, describe chemical equations between them, using conservation of mass and rate law, formulate in ODE and solve numerically:
+\begin{enumerate}
+    \item \textbf{Model 1:} 
+    \begin{enumerate}
+        \item Simple 3-species photochemical cycle (NO, NO$_2$, O$_3$)
+        \item A bit refined 4-species photochemical cycle (NO, NO$_2$, O$_3$, O)
+    \end{enumerate}
+    \item \textbf{Model 2:} Refined 11-species system with VOCs and radicals
+\end{enumerate}
+
+\section*{Model 1: Basic Photochemical Cycle}
+\subsection*{3-species Model}
+Model 1 captures the fundamental NO-NO$_2$-O$_3$ photochemical cycle with three species and three reactions:
+\begin{align}
+    \text{NO}_2 + h\nu &\xrightarrow{k_1} \text{NO} + \text{O}_3 \label{eq:r1} \\
+    \text{NO} + \text{O}_3 &\xrightarrow{k_3} \text{NO}_2 + \text{O}_2 \label{eq:r2}
+\end{align}
+Reaction \eqref{eq:r1} is photochemical (requires sunlight with rate constant $k_1$), while reaction \eqref{eq:r2} occurs day and night (rate constant $k_3$). These reactions form a cycle that interconverts NO and NO$_2$ but \textit{cannot produce net ozone}-a key limitation we'll address in Model 2.
+
+\subsection*{Mathematical Formulation}
+\subsection*{General Mass Balance Equation}
+For a well-mixed box (closed system, uniform concentration):
+\begin{equation}
+\frac{dC_i}{dt} = r_i + E_i
+\label{eq:simplified_balance}
+\end{equation}
+The reaction rate $r_i$ is the algebraic sum of production and consumption terms from all reactions involving species $i$:
+
+\begin{equation}
+r_i = \sum_{j=1}^{N_{\text{rxn}}} \nu_{ij} R_j
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $\nu_{ij}$ = stoichiometric coefficient of species $i$ in reaction $j$ (positive for products, negative for reactants)
+    \item $R_j$ = rate of reaction $j$ (ppm/h)
+    \item $N_{\text{rxn}}$ = total number of reactions
+\end{itemize}
+Applying mass conservation with emission sources:
+
+\begin{align}
+    \frac{d[\text{NO}]}{dt} &= k_1[\text{NO}_2] - k_3[\text{NO}][\text{O}_3] + E_{\text{NO}} \label{eq:dNO1}\\
+    \frac{d[\text{NO}_2]}{dt} &= -k_1[\text{NO}_2] + k_3[\text{NO}][\text{O}_3] + E_{\text{NO}_2} \label{eq:dNO21}\\
+    \frac{d[\text{O}_3]}{dt} &= k_1[\text{NO}_2] - k_3[\text{NO}][\text{O}_3] \label{eq:dO31}
+\end{align}
+
+
+\subsection*{4-species Model}
+
+\subsection*{Reaction Mechanism}
+
+Model 1 captures the fundamental NO-NO$_2$-O$_3$ triad plus atomic oxygen:
+
+\begin{align}
+    \text{NO}_2 + h\nu &\xrightarrow{k_1} \text{NO} + \text{O}(^3\text{P}) \label{rxn:m1r1} \\
+    \text{O}(^3\text{P}) + \text{O}_2 + M &\xrightarrow{k_2} \text{O}_3 + M \label{rxn:m1r2} \\
+    \text{O}_3 + \text{NO} &\xrightarrow{k_3} \text{NO}_2 + \text{O}_2 \label{rxn:m1r3} \\
+    \text{NO}_2 + \text{O}(^3\text{P}) &\xrightarrow{k_4} \text{NO} + \text{O}_2 \label{rxn:m1r4} \\
+    \text{NO} + \text{O}(^3\text{P}) &\xrightarrow{k_5} \text{NO}_2 \label{rxn:m1r5}
+\end{align}
+where M represents air as a third body in the termolecular reaction \eqref{rxn:m1r2}.
+\begin{itemize}
+    \item Reaction \eqref{rxn:m1r1}: NO$_2$ photolysis produces atomic oxygen (photochemical, daytime only)
+    % \item Reaction \eqref{rxn:m1r2}: Atomic oxygen rapidly forms ozone (very fast, k$_2$ large)
+    \item Reaction \eqref{rxn:m1r3}: NO immediately reacts with O$_3$, \textbf{preventing accumulation}
+    \item Reactions \eqref{rxn:m1r4}-\eqref{rxn:m1r5}: Additional O-NO$_x$ interactions
+\end{itemize}
+
+\subsection*{Mathematical Formulation}
+
+Applying species mass balance with emission sources:
+
+\begin{align}
+    \frac{d[\text{NO}]}{dt} &= R_1 - R_3 + R_4 - R_5 + E_{\text{NO}} \\
+    \frac{d[\text{NO}_2]}{dt} &= -R_1 + R_3 - R_4 + R_5 + E_{\text{NO}_2} \\
+    \frac{d[\text{O}_3]}{dt} &= R_2 - R_3 \\
+    \frac{d[\text{O}]}{dt} &= R_1 - R_2 - R_4 - R_5
+\end{align}
+
+where reaction rates are:
+\begin{align}
+    R_1 &= k_1(t) [\text{NO}_2] \\
+    R_2 &= k_2 [\text{O}][\text{O}_2]M \\
+    R_3 &= k_3 [\text{O}_3][\text{NO}] \\
+    R_4 &= k_4 [\text{NO}_2][\text{O}] \\
+    R_5 &= k_5 [\text{NO}][\text{O}]
+\end{align}
+
+The photolysis rate k$_1$(t) varies diurnally:
+\begin{equation}
+    k_1(t) = \begin{cases}
+        k_{1,\text{max}} \sin\left(\frac{\pi(t_{\text{clock}} - 6)}{12}\right) & \text{if } 6 \leq t_{\text{clock}} \leq 18 \\
+        0 & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+\subsection*{Parameters and Initial Conditions}
+
+\begin{table}[H]
+\centering
+\caption{Model 1 parameters at T = 288 K \cite{pr13051384}}
+\label{tab:m1_params}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Parameter & Value & Units \\ \midrule
+$k_{1,\text{max}}$ & 30.48 & h$^{-1}$ \\
+$k_2$ & 1.44 $\times$ 10$^{-3}$ & ppm$^{-2}$ h$^{-1}$ \\
+$k_3$ & 1.20 $\times$ 10$^5$ & ppm$^{-1}$ h$^{-1}$ \\
+$k_4$ & 8.04 $\times$ 10$^5$ & ppm$^{-1}$ h$^{-1}$ \\
+$k_5$ & 1.99 $\times$ 10$^5$ & ppm$^{-1}$ h$^{-1}$ \\
+{[O$_2$] M} & 210,000 & ppm \\
+$E_{\text{NO}}$ & 0.02 & ppm h$^{-1}$ \\
+$E_{\text{NO}_2}$ & 0.01 & ppm h$^{-1}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Model 1 initial conditions (5:00 AM)}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Species & Initial Concentration (ppm) \\ \midrule
+NO & 0.100 \\
+NO$_2$ & 0.050 \\
+O$_3$ & 0.0 \\
+O & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% \subsection*{Results}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Media/model1_results_1.pdf}
+    \includegraphics[width=0.85\textwidth]{Media/model1_results.pdf}
+    \caption{Model 1 (a) 3-species and (b) 4-species concentration profiles from 5:00 AM to midnight. (Top left) NO and NO$_2$ concentrations. (Top right) Ozone formation with (a) peak ($\sim 0.0004$ ppm)(b) very low peak ($\sim$0.006 ppb). (b) (Bottom left) Atomic oxygen (scaled) tracking photolysis. (Bottom right) Normalized comparison showing relative dynamics. Yellow shading indicates daylight hours (6:00-18:00).}
+    \label{fig:m1}
+\end{figure}
+
+\subsection*{Key Observations}
+
+\begin{enumerate}
+    \item \textbf{Minimal ozone production:} Peak O$_3$ reaches only $\sim$0.003 ppb at 8:00, far below ambient air quality standards (0.07 ppm)
+    
+    \item \textbf{NO-NO$_2$ concentration:} Unable to show increase-decrease pattern in either - indicating some key species missing in our model.
+    
+    \item \textbf{Atomic oxygen:} Very low steady-state concentration ($\sim$10$^{-6}$ ppm) due to fast reaction with O$_2$ (R$_2$)
+\end{enumerate}
+
+\subsection*{Limitations}
+\begin{itemize}
+    \item \textbf{Unrealistic ozone:} Cannot explain observed urban smog episodes (O$_3$ > 0.07 ppm)
+    \item \textbf{Missing VOC chemistry:} No role for hydrocarbons in oxidation
+    \item \textbf{No radical pathways:} Lacks OH, HO$_2$, RO$_2$ that drive real atmospheric chemistry
+\end{itemize}
+The fundamental problem: \textit{there is no mechanism to convert NO to NO$_2$ without consuming O$_3$}. This motivates Model 2.
+
+\section*{Model 2: Refined System with VOCs}
+
+\subsection*{System Extension}
+
+Model 2 adds 7 new species to capture VOC oxidation and radical chemistry:
+
+\begin{itemize}
+    \item \textbf{CO:} Carbon monoxide (primary pollutant, radical precursor)
+    \item \textbf{HCHO:} Formaldehyde (VOC oxidation product, radical source)
+    \item \textbf{ALK:} Lumped alkanes (saturated hydrocarbons)
+    \item \textbf{OLE:} Lumped olefins (unsaturated hydrocarbons)
+    \item \textbf{OH:} Hydroxyl radical (primary atmospheric oxidant)
+    \item \textbf{HO$_2$:} Hydroperoxyl radical
+    \item \textbf{RO$_2$:} Organic peroxy radicals
+\end{itemize}
+
+\textbf{Total species:} 11 (NO, NO$_2$, O$_3$, O, CO, HCHO, ALK, OLE, OH, HO$_2$, RO$_2$)
+
+\subsection*{Extended Reaction Mechanism}
+
+Building on Model 1's 5 reactions, we add 10 more:
+
+\begin{align}
+    \text{O}_3 + h\nu &\xrightarrow{k_4} \text{O}(^1\text{D}) + \text{O}_2 \label{rxn:m2r4} \\
+    \text{O}(^1\text{D}) + \text{H}_2\text{O} &\xrightarrow{k_5} 2\text{OH} \label{rxn:m2r5} \\
+    \text{CO} + \text{OH} &\xrightarrow{k_6} \text{HO}_2 + \text{CO}_2 \label{rxn:m2r6} \\
+    \text{HCHO} + h\nu &\xrightarrow{k_7} 2\text{HO}_2 + \text{CO} \label{rxn:m2r7} \\
+    \text{HCHO} + \text{OH} &\xrightarrow{k_8} \text{HO}_2 + \text{CO} + \text{H}_2\text{O} \label{rxn:m2r8} \\
+    \text{ALK} + \text{OH} &\xrightarrow{k_9} \text{RO}_2 \label{rxn:m2r9} \\
+    \text{OLE} + \text{OH} &\xrightarrow{k_{10}} \text{RO}_2 \label{rxn:m2r10} \\
+    \text{OLE} + \text{O}_3 &\xrightarrow{k_{11}} 0.5\text{HCHO} + \text{products} \label{rxn:m2r11} \\
+    \text{HO}_2 + \text{NO} &\xrightarrow{k_{12}} \text{NO}_2 + \text{OH} \quad \textbf{(Key!)} \label{rxn:m2r12} \\
+    \text{RO}_2 + \text{NO} &\xrightarrow{k_{13}} \text{NO}_2 + \text{HO}_2 \quad \textbf{(Key!)} \label{rxn:m2r13} \\
+    \text{HO}_2 + \text{HO}_2 &\xrightarrow{k_{14}} \text{H}_2\text{O}_2 + \text{O}_2 \label{rxn:m2r14} \\
+    \text{OH} + \text{NO}_2 &\xrightarrow{k_{15}} \text{HNO}_3 \label{rxn:m2r15}
+\end{align}
+
+\textbf{Critical breakthrough:} Reactions \eqref{rxn:m2r12} and \eqref{rxn:m2r13} convert NO to NO$_2$ \textit{without consuming O$_3$}! This enables net ozone accumulation.
+
+\subsection*{Parameters}
+
+\begin{table}[H]
+\centering
+\caption{Additional rate constants for Model 2 (T = 288 K) \cite{pr13051384}}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Reaction & Rate Constant & Units \\ \midrule
+k$_4$ (O$_3$ photolysis) & 1.968 & h$^{-1}$ \\
+k$_5$ (O($^1$D) + H$_2$O) & 6.0 $\times$ 10$^6$ & ppm$^{-1}$ h$^{-1}$ \\
+k$_6$ (CO + OH) & 2.64 $\times$ 10$^4$ & ppm$^{-1}$ h$^{-1}$ \\
+k$_7$ (HCHO photolysis) & 0.170 & h$^{-1}$ \\
+k$_8$ (HCHO + OH) & 1.152 $\times$ 10$^6$ & ppm$^{-1}$ h$^{-1}$ \\
+k$_9$ (ALK + OH) & 2.82 $\times$ 10$^5$ & ppm$^{-1}$ h$^{-1}$ \\
+k$_{10}$ (OLE + OH) & 5.349 $\times$ 10$^6$ & ppm$^{-1}$ h$^{-1}$ \\
+k$_{11}$ (OLE + O$_3$) & 8.16 & ppm$^{-1}$ h$^{-1}$ \\
+k$_{12}$ (HO$_2$ + NO) & 7.2 $\times$ 10$^5$ & ppm$^{-1}$ h$^{-1}$ \\
+k$_{13}$ (RO$_2$ + NO) & 7.2 $\times$ 10$^5$ & ppm$^{-1}$ h$^{-1}$ \\
+k$_{14}$ (HO$_2$ + HO$_2$) & 2.22 $\times$ 10$^5$ & ppm$^{-1}$ h$^{-1}$ \\
+k$_{15}$ (OH + NO$_2$) & Complex T-dep. & ppm$^{-1}$ h$^{-1}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Model 2 initial conditions and emissions}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Species & Initial (ppm) & Emission (ppm h$^{-1}$) \\ \midrule
+NO & 0.100 & 0.02 \\
+NO$_2$ & 0.050 & 0.01 \\
+CO & 0.100 & 0.02 \\
+HCHO & 0.010 & 0.03 \\
+ALK & 1.000 & 0.10 \\
+OLE & 0.200 & 0.0 \\
+OH & 0 & 0 \\
+HO$_2$ & 0 & 0 \\
+RO$_2$ & 0 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Results}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Media/model2_results.pdf}
+    \caption{Model 2 comprehensive results. (Top row) Ozone reaches realistic levels ($\sim$0.08 ppm), NO-NO$_2$ dynamics, and radical species tracking solar radiation. (Middle row) VOC depletion, secondary products (HCHO, CO), and NO$\to$NO$_2$ conversion pathways. (Bottom row) NO$_x$ budget, oxidant capacity, and NO/NO$_2$ ratio evolution. Model successfully produces net ozone through radical chemistry.}
+    \label{fig:m2}
+\end{figure}
+
+\subsection*{Key Observations}
+
+\begin{enumerate}
+    \item \textbf{Realistic ozone:} Peak O$_3$ = 0.619979 ppm at 7:30.
+    
+    \item \textbf{Radical dynamics:} OH, HO$_2$, RO$_2$ peak at early hours ($\sim$10$^{-6}$ to 10$^{-3}$ ppm), drop to zero at night
+    
+    \item \textbf{VOC consumption:} ALK decreases 23\%, OLE decreases 100\% (fully depleted), demonstrating active oxidation
+    
+    \item \textbf{Pathway dominance:} At peak O$_3$, NO$\to$NO$_2$ conversion is dominated by RO$_2$ + NO (94.5\%), with only HO$_2$ + NO (2.9\%) and 2.6\% via O$_3$ titration
+    
+    \item \textbf{Radical catalysis:} Despite trace OH ($\sim$10$^{-6}$ ppm), substantial ozone forms.
+    
+    \item \textbf{NO$_x$ budget:} Total NO$_x$ decreases from 0.15 to 0.08 ppm due to HNO$_3$ formation (R$_{15}$)
+    
+    \item \textbf{Oxidant capacity:} O$_x$ (O$_3$ + NO$_2$) steadily increases, indicating net oxidation
+\end{enumerate}
+\subsection*{Comparison with Model 1}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Media/comparison_models.pdf}
+    \caption{Direct comparison between models. (Top left) Ozone enhancement: Model 2 produces 27× more O$_3$ than Model 1. (Top right) NO depletion is faster in Model 2 due to additional radical pathways. (Bottom left) NO$_2$ shows more complex dynamics. (Bottom right) O$_3$ enhancement factor peaks in afternoon when radical chemistry is most active.}
+    \label{fig:comparison}
+\end{figure}
+
+% \begin{table}[H]
+% \centering
+% \caption{Quantitative model comparison}
+% \begin{tabular}{@{}lcc@{}}
+% \toprule
+% Metric & Model 1 & Model 2 \\ \midrule
+% Number of species & 4 & 11 \\
+% Number of reactions & 5 & 15 \\
+% Peak O$_3$ (ppm) & 0.0030 & 0.0795 \\
+% Peak time & 11:00 & 13:30 \\
+% Enhancement factor & 1× & 27× \\
+% Min NO (ppm) & 0.029 & 0.0003 \\
+% VOC chemistry & No & Yes \\
+% Radical pathways & No & Yes \\
+% Net oxidation & No & Yes \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+% \textbf{Why Model 2 succeeds:}
+
+% \begin{itemize}
+%     \item \textbf{Alternative NO oxidation:} Radicals (HO$_2$, RO$_2$) oxidize NO without consuming O$_3$
+%     \item \textbf{Radical regeneration:} OH consumed by VOCs is regenerated by HO$_2$ + NO, creating catalytic cycles
+%     \item \textbf{Delayed peak:} O$_3$ maximum shifts from 11:00 to 13:30 because time is needed for radical buildup
+%     \item \textbf{Complete depletion:} NO drops to 0.0003 ppm (1000× lower than Model 1), removing the titration bottleneck
+% \end{itemize}
+
+% \subsection*{Physical Mechanisms}
+
+% The fundamental difference between models lies in the NO$\to$NO$_2$ conversion mechanism:
+
+% \textbf{Model 1 pathway:}
+% \begin{equation}
+%     \text{NO} + \text{O}_3 \xrightarrow{k_3} \text{NO}_2 + \text{O}_2 \quad \text{(consumes O}_3\text{)}
+% \end{equation}
+
+% \textbf{Model 2 pathway:}
+% \begin{align}
+%     \text{CO} + \text{OH} &\rightarrow \text{HO}_2 + \text{CO}_2 \\
+%     \text{HO}_2 + \text{NO} &\rightarrow \text{NO}_2 + \text{OH} \quad \text{(preserves O}_3\text{)} \\
+%     \text{NO}_2 + h\nu &\rightarrow \text{NO} + \text{O}_3
+% \end{align}
+% Net: CO + 2O$_2$ + h$\nu$ $\rightarrow$ CO$_2$ + O$_3$ (OH acts as catalyst)
+
+% This alternative pathway breaks the cycle limitation, enabling ozone accumulation.
+
+% \subsection*{Implications}
+
+% \textbf{For air quality management:}
+% \begin{itemize}
+%     \item VOC control is \textit{essential} — NO$_x$ reduction alone insufficient
+%     \item Radical chemistry amplifies effects: small VOC changes $\rightarrow$ large O$_3$ changes
+%     \item Timing matters: early morning emissions most impactful (contribute to afternoon peak)
+% \end{itemize}
+
+% \textbf{Model hierarchy:}
+% \begin{enumerate}
+%     \item Model 1: Educational baseline, shows NO$_x$ cycling
+%     \item Model 2: Captures essential smog chemistry with manageable complexity
+%     \item Full mechanisms (52+ reactions): Research-grade predictions
+% \end{enumerate}
+
+% \section*{Conclusions}
+
+% This study demonstrated photochemical smog modeling through progressive complexity:
+
+% \textbf{Model 1 (Basic):}
+% \begin{itemize}
+%     \item 4 species, 5 reactions
+%     \item Peak O$_3$ = 0.003 ppm (unrealistically low)
+%     \item Demonstrates NO$_x$ photochemical cycling
+%     \item Limited by NO titration — every O$_3$ molecule consumed
+% \end{itemize}
+
+% \textbf{Model 2 (Refined):}
+% \begin{itemize}
+%     \item 11 species, 15 reactions
+%     \item Peak O$_3$ = 0.0795 ppm (realistic urban levels)
+%     \item Includes VOC oxidation and radical chemistry
+%     \item 27× ozone enhancement demonstrates critical role of VOCs
+%     \item Radicals enable NO$\to$NO$_2$ conversion without O$_3$ consumption
+% \end{itemize}
+
+% \textbf{Key insight:} Photochemical smog requires VOC-mediated radical chemistry. Simple NO$_x$ cycling cannot produce net ozone — an alternative oxidation pathway is essential.
+
+% \textbf{Modeling approach:} Starting simple (Model 1) establishes baseline understanding, then adding essential complexity (Model 2) captures phenomenon while maintaining interpretability. This hierarchy balances tractability and realism.
+
+% Future work could extend Model 2 by adding: explicit VOC speciation (separate alkanes/alkenes/aromatics), nitrogen product chemistry (PAN, organic nitrates), aerosol formation, and spatial transport. However, the current framework successfully demonstrates the fundamental mechanisms governing urban photochemical smog.
+
+
+\newpage
+\appendix
+
+\section*{Appendix: Mathematical Formulation, GRS ODEs, parameter table}
+
+% \subsection*{Rate laws}
+% \[
+% \begin{aligned}
+% r_1 &= k_1(t)\,[\mathrm{ROC}], \\
+% r_2 &= k_2\,[\mathrm{RP}][\mathrm{NO}], \\
+% r_3 &= k_3(t)\,[\mathrm{NO}_2], \\
+% r_4 &= k_4\,[\mathrm{NO}][\mathrm{O}_3], \\
+% r_5 &= k_5\,[\mathrm{RP}]^2, \\
+% r_6 &= k_6\,[\mathrm{RP}][\mathrm{NO}_2], \\
+% r_7 &= k_7\,[\mathrm{RP}][\mathrm{NO}_2].
+% \end{aligned}
+% \]
+
+% \subsection*{GRS ODEs (closed-box)}
+% \[
+% \begin{aligned}
+% \frac{d[\mathrm{ROC}]}{dt} &= -r_1 + E_{\mathrm{ROC}},\\[4pt]
+% \frac{d[\mathrm{RP}]}{dt} &= r_1 - r_2 - 2r_5 - r_6 - r_7,\\[4pt]
+% \frac{d[\mathrm{NO}]}{dt} &= -r_2 - r_4 + r_3 + E_{\mathrm{NO}},\\[4pt]
+% \frac{d[\mathrm{NO}_2]}{dt} &= r_2 + r_4 - r_3 - r_6 - r_7 + E_{\mathrm{NO}_2},\\[4pt]
+% \frac{d[\mathrm{O}_3]}{dt} &= r_3 - r_4 - L_{\mathrm{O}_3}[\mathrm{O}_3],\\[4pt]
+% \frac{d[\mathrm{SGN}]}{dt} &= r_6 - k_{d1}[\mathrm{SGN}],\\[4pt]
+% \frac{d[\mathrm{SNGN}]}{dt} &= r_7 + k_{d1}[\mathrm{SGN}].
+% \end{aligned}
+% \]
+
+% \subsection*{Photolysis envelope}
+% Photolytic coefficients are time dependent:
+% \[
+% k_i(t) = 
+% \begin{cases}
+% 0, & \sin\left( \frac{2\pi}{24}(t-6) \right) \le 0,\\[4pt]
+% (k_{i,\max}\times 60)\,\sin\left( \frac{2\pi}{24}(t-6) \right), & \text{otherwise},
+% \end{cases}
+% \]
+% where $k_{i,\max}$ is given in min$^{-1}$ at solar noon and multiplied by 60 to convert to h$^{-1}$.
+
+% \subsection*{IER empirical model (IER-1)}
+% We implement a compact Integrated Empirical Rate (IER) form:
+% \[
+% \frac{dSP}{dt} = \alpha\, J(t)\,[\mathrm{ROC}] \frac{[\mathrm{NO}]+[\mathrm{NO}_2]}{[\mathrm{NO}]+[\mathrm{NO}_2] + K_N},
+% \]
+% where $SP$ denotes Smog Produced (cumulative oxidant), $J(t)$ is the photolysis envelope, and $\alpha, K_N$ are empirical parameters.
+
+% \subsection*{Parameter table (placeholders used in runs)}
+% \begin{tabular}{llc}
+% Parameter & Meaning & Value (units) \\
+% \hline
+% $T$ & Temperature & 288 (K) \\
+% $k_{3,\max}$ & NO$_2$ photolysis at noon & 0.508 (min$^{-1}$) \\
+% $k_{1,\max}$ & ROC photolysis at noon (placeholder) & 0.20 (min$^{-1}$) \\
+% $k_2$ & RP + NO & $1.0\times10^3$ (min$^{-1}$ ppm$^{-1}$) \\
+% $k_4$ & NO + O$_3$ & $3.1\times10^3\exp(-1450/T)$ (min$^{-1}$ ppm$^{-1}$) \\
+% $k_5$ & RP + RP (termination) & 5.0 (min$^{-1}$ ppm$^{-1}$) \\
+% $k_6,k_7$ & RP + NO$_2$ (sinks) & 0.1, 0.05 (min$^{-1}$ ppm$^{-1}$) \\
+% $L_{O_3}$ & Ozone generic loss & 0.1 (h$^{-1}$) \\
+% $E_{\mathrm{NO}}$ & NO emission & 0.02 (ppm h$^{-1}$) \\
+% $E_{\mathrm{NO}_2}$ & NO$_2$ emission & 0.01 (ppm h$^{-1}$) \\
+% $[\mathrm{NO}]_0$ & Initial NO & 1.0 (ppm) \\
+% $[\mathrm{NO}_2]_0$ & Initial NO$_2$ & 0.05 (ppm) \\
+% $[\mathrm{ROC}]_0$ & Initial ROC & 0.1 (ppm) \\
+% $\alpha$ & IER empirical coefficient & 0.5 (tunable) \\
+% $K_N$ & IER NOx half-sat & 0.1 (ppm)
+% \end{tabular}
+
+% \subsection*{Notes}
+% These parameter values are placeholders consistent with the chapter and the Carrasco-Venegas (Processes) paper; tune them for specific cases or copy exact reaction constants from the detailed reaction table in the Processes paper when implementing the full 31-ODE mechanism.
+
+\section*{Model 2: Complete Differential Equations}
+
+\subsubsection*{Species Conservation Equations}
+
+For Model 2 with 11 species and 15 reactions:
+
+\textbf{1. Nitric Oxide (NO):}
+\begin{align}
+\frac{d[\text{NO}]}{dt} &= R_1 - R_3 - R_{12} - R_{13} + E_{\text{NO}} \nonumber \\
+&= k_1[\text{NO}_2] - k_3[\text{O}_3][\text{NO}] - k_{12}[\text{HO}_2][\text{NO}] \nonumber \\
+&\quad - k_{13}[\text{RO}_2][\text{NO}] + E_{\text{NO}}
+\label{eq:m2_NO}
+\end{align}
+
+\textbf{2. Nitrogen Dioxide (NO$_2$):}
+\begin{align}
+\frac{d[\text{NO}_2]}{dt} &= -R_1 + R_3 + R_{12} + R_{13} - R_{15} + E_{\text{NO}_2} \nonumber \\
+&= -k_1[\text{NO}_2] + k_3[\text{O}_3][\text{NO}] + k_{12}[\text{HO}_2][\text{NO}] \nonumber \\
+&\quad + k_{13}[\text{RO}_2][\text{NO}] - k_{15}[\text{OH}][\text{NO}_2] + E_{\text{NO}_2}
+\label{eq:m2_NO2}
+\end{align}
+
+\textbf{3. Ozone (O$_3$):}
+\begin{align}
+\frac{d[\text{O}_3]}{dt} &= R_2 - R_3 - R_4 - R_{11} \nonumber \\
+&= k_2[\text{O}][\text{O}_2] - k_3[\text{O}_3][\text{NO}] - k_4[\text{O}_3] - k_{11}[\text{OLE}][\text{O}_3]
+\label{eq:m2_O3}
+\end{align}
+
+\textbf{4. Atomic Oxygen (O):}
+\begin{align}
+\frac{d[\text{O}]}{dt} &= R_1 - R_2 \nonumber \\
+&= k_1[\text{NO}_2] - k_2[\text{O}][\text{O}_2]
+\label{eq:m2_O}
+\end{align}
+
+\textbf{5. Carbon Monoxide (CO):}
+\begin{align}
+\frac{d[\text{CO}]}{dt} &= -R_6 + R_7 + R_8 + E_{\text{CO}} \nonumber \\
+&= -k_6[\text{CO}][\text{OH}] + k_7[\text{HCHO}] + k_8[\text{HCHO}][\text{OH}] + E_{\text{CO}}
+\label{eq:m2_CO}
+\end{align}
+
+\textbf{6. Formaldehyde (HCHO):}
+\begin{align}
+\frac{d[\text{HCHO}]}{dt} &= 0.5 R_{11} - R_7 - R_8 + E_{\text{HCHO}} \nonumber \\
+&= 0.5 k_{11}[\text{OLE}][\text{O}_3] - k_7[\text{HCHO}] - k_8[\text{HCHO}][\text{OH}] \nonumber \\
+&\quad + E_{\text{HCHO}}
+\label{eq:m2_HCHO}
+\end{align}
+
+\textbf{7. Alkanes (ALK):}
+\begin{align}
+\frac{d[\text{ALK}]}{dt} &= -R_9 + E_{\text{ALK}} \nonumber \\
+&= -k_9[\text{ALK}][\text{OH}] + E_{\text{ALK}}
+\label{eq:m2_ALK}
+\end{align}
+
+\textbf{8. Olefins (OLE):}
+\begin{align}
+\frac{d[\text{OLE}]}{dt} &= -R_{10} - R_{11} + E_{\text{OLE}} \nonumber \\
+&= -k_{10}[\text{OLE}][\text{OH}] - k_{11}[\text{OLE}][\text{O}_3] + E_{\text{OLE}}
+\label{eq:m2_OLE}
+\end{align}
+
+\textbf{9. Hydroxyl Radical (OH):}
+\begin{align}
+\frac{d[\text{OH}]}{dt} &= 2R_5 - R_6 - R_8 - R_9 - R_{10} - R_{15} + R_{12} \nonumber \\
+&= 2k_5[\text{O}(^1\text{D})][\text{H}_2\text{O}] - k_6[\text{CO}][\text{OH}] - k_8[\text{HCHO}][\text{OH}] \nonumber \\
+&\quad - k_9[\text{ALK}][\text{OH}] - k_{10}[\text{OLE}][\text{OH}] - k_{15}[\text{OH}][\text{NO}_2] \nonumber \\
+&\quad + k_{12}[\text{HO}_2][\text{NO}]
+\label{eq:m2_OH}
+\end{align}
+
+\textbf{10. Hydroperoxyl Radical (HO$_2$):}
+\begin{align}
+\frac{d[\text{HO}_2]}{dt} &= R_6 + 2R_7 + R_8 + 0.5R_{11} + R_{13} - R_{12} - 2R_{14} \nonumber \\
+&= k_6[\text{CO}][\text{OH}] + 2k_7[\text{HCHO}] + k_8[\text{HCHO}][\text{OH}] \nonumber \\
+&\quad + 0.5k_{11}[\text{OLE}][\text{O}_3] + k_{13}[\text{RO}_2][\text{NO}] \nonumber \\
+&\quad - k_{12}[\text{HO}_2][\text{NO}] - 2k_{14}[\text{HO}_2]^2
+\label{eq:m2_HO2}
+\end{align}
+
+\textbf{11. Organic Peroxy Radical (RO$_2$):}
+\begin{align}
+\frac{d[\text{RO}_2]}{dt} &= R_9 + R_{10} + 0.5R_{11} - R_{13} \nonumber \\
+&= k_9[\text{ALK}][\text{OH}] + k_{10}[\text{OLE}][\text{OH}] + 0.5k_{11}[\text{OLE}][\text{O}_3] \nonumber \\
+&\quad - k_{13}[\text{RO}_2][\text{NO}]
+\label{eq:m2_RO2}
+\end{align}
+
+\subsubsection*{Reaction Rates}
+
+The individual reaction rates for Model 2 are:
+
+\begin{align}
+R_1 &= k_1(t) [\text{NO}_2] && \text{(NO$_2$ photolysis)} \\
+R_2 &= k_2 [\text{O}][\text{O}_2] && \text{(O$_3$ formation)} \\
+R_3 &= k_3 [\text{O}_3][\text{NO}] && \text{(NO oxidation by O$_3$)} \\
+R_4 &= k_4(t) [\text{O}_3] && \text{(O$_3$ photolysis)} \\
+R_5 &= k_5 [\text{O}(^1\text{D})][\text{H}_2\text{O}] && \text{(OH formation)} \\
+R_6 &= k_6 [\text{CO}][\text{OH}] && \text{(CO oxidation)} \\
+R_7 &= k_7(t) [\text{HCHO}] && \text{(HCHO photolysis)} \\
+R_8 &= k_8 [\text{HCHO}][\text{OH}] && \text{(HCHO oxidation)} \\
+R_9 &= k_9 [\text{ALK}][\text{OH}] && \text{(Alkane oxidation)} \\
+R_{10} &= k_{10} [\text{OLE}][\text{OH}] && \text{(Olefin oxidation by OH)} \\
+R_{11} &= k_{11} [\text{OLE}][\text{O}_3] && \text{(Olefin ozonolysis)} \\
+R_{12} &= k_{12} [\text{HO}_2][\text{NO}] && \text{\textbf{(Key: NO$\to$NO$_2$ via HO$_2$)}} \\
+R_{13} &= k_{13} [\text{RO}_2][\text{NO}] && \text{\textbf{(Key: NO$\to$NO$_2$ via RO$_2$)}} \\
+R_{14} &= k_{14} [\text{HO}_2]^2 && \text{(HO$_2$ termination)} \\
+R_{15} &= k_{15} [\text{OH}][\text{NO}_2] && \text{(HNO$_3$ formation)}
+\end{align}
+
+\subsubsection*{Excited State Oxygen (Quasi-Steady-State)}
+
+For O($^1$D) (excited singlet oxygen), we apply the quasi-steady-state approximation:
+
+\begin{equation}
+\frac{d[\text{O}(^1\text{D})]}{dt} \approx 0
+\end{equation}
+Production equals consumption:
+\begin{equation}
+k_4[\text{O}_3] = k_5[\text{O}(^1\text{D})][\text{H}_2\text{O}]
+\end{equation}
+Solving for [O($^1$D)]:
+\begin{equation}
+[\text{O}(^1\text{D})] = \frac{k_4[\text{O}_3]}{k_5[\text{H}_2\text{O}]}
+\label{eq:O1D_qss}
+\end{equation}
+This concentration is substituted directly into Equation \ref{eq:m2_OH}.
+
+\section*{GRS reaction list (symbolic)}
+The Generic Reaction Set (GRS) used in \cite{book} (will discuss this during presentation):
+\begin{align*}
+\text{(R1)}\quad & \mathrm{ROC} + h\nu \;\longrightarrow\; \mathrm{RP} + \mathrm{ROC} \\
+\text{(R2)}\quad & \mathrm{RP} + \mathrm{NO} \;\longrightarrow\; \mathrm{NO}_2 \\
+\text{(R3)}\quad & \mathrm{NO}_2 + h\nu \;\longrightarrow\; \mathrm{NO} + \mathrm{O} \\
+\text{(R4)}\quad & \mathrm{NO} + \mathrm{O}_3 \;\longrightarrow\; \mathrm{NO}_2 + \mathrm{O}_2 \\
+\text{(R5)}\quad & \mathrm{RP} + \mathrm{RP} \;\longrightarrow\; \text{termination products} \\
+\text{(R6)}\quad & \mathrm{RP} + \mathrm{NO}_2 \;\longrightarrow\; \mathrm{SGN} \\
+\text{(R7)}\quad & \mathrm{RP} + \mathrm{NO}_2 \;\longrightarrow\; \mathrm{SNGN}
+\end{align*}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Media/gre.png}
+    \caption{Brief discussion on a generic reaction set as described by \cite{book}}
+    \label{fig:comparison}
+\end{figure}
+
+% \subsubsection*{Rate Constants at T = 288 K}
+
+% \textbf{Photolysis rates (time-dependent):}
+% \begin{align}
+% k_1(t) &= 30.48 \times f_{\text{solar}}(t) \text{ h}^{-1} \\
+% k_4(t) &= 1.968 \times f_{\text{solar}}(t) \text{ h}^{-1} \\
+% k_7(t) &= 0.170 \times f_{\text{solar}}(t) \text{ h}^{-1}
+% \end{align}
+
+% where:
+% \begin{equation}
+% f_{\text{solar}}(t) = \begin{cases}
+% \sin\left(\frac{\pi(t_{\text{clock}} - 6)}{12}\right) & \text{if } 6 \leq t_{\text{clock}} \leq 18 \\
+% 0 & \text{otherwise}
+% \end{cases}
+% \end{equation}
+
+% \textbf{Chemical reaction rates:}
+% \begin{align}
+% k_2 &= 1.44 \times 10^{-3} \text{ ppm}^{-2}\text{ h}^{-1} \\
+% k_3 &= 1.20 \times 10^5 \text{ ppm}^{-1}\text{ h}^{-1} \\
+% k_5 &= 6.0 \times 10^6 \text{ ppm}^{-1}\text{ h}^{-1} \\
+% k_6 &= 2.64 \times 10^4 \text{ ppm}^{-1}\text{ h}^{-1} \\
+% k_8 &= 1.152 \times 10^6 \text{ ppm}^{-1}\text{ h}^{-1} \\
+% k_9 &= 2.82 \times 10^5 \text{ ppm}^{-1}\text{ h}^{-1} \\
+% k_{10} &= 5.349 \times 10^6 \text{ ppm}^{-1}\text{ h}^{-1} \\
+% k_{11} &= 8.16 \text{ ppm}^{-1}\text{ h}^{-1} \\
+% k_{12} &= 7.2 \times 10^5 \text{ ppm}^{-1}\text{ h}^{-1} \\
+% k_{13} &= 7.2 \times 10^5 \text{ ppm}^{-1}\text{ h}^{-1} \\
+% k_{14} &= 2.22 \times 10^5 \text{ ppm}^{-1}\text{ h}^{-1} \\
+% k_{15} &= 1.477 \times 10^{15} \times 10^{-\frac{11.6T}{17.4+T}} \times \left(\frac{280}{T}\right)^2 \times 60 \text{ ppm}^{-1}\text{ h}^{-1}
+% \end{align}
+
+% \subsubsection*{Constants and Emissions}
+
+% \begin{align}
+% [\text{O}_2] &= 210{,}000 \text{ ppm} \\
+% [\text{H}_2\text{O}] &= 15{,}000 \text{ ppm} \\
+% E_{\text{NO}} &= 0.02 \text{ ppm h}^{-1} \\
+% E_{\text{NO}_2} &= 0.01 \text{ ppm h}^{-1} \\
+% E_{\text{CO}} &= 0.02 \text{ ppm h}^{-1} \\
+% E_{\text{HCHO}} &= 0.03 \text{ ppm h}^{-1} \\
+% E_{\text{ALK}} &= 0.10 \text{ ppm h}^{-1} \\
+% E_{\text{OLE}} &= 0.0 \text{ ppm h}^{-1}
+% \end{align}
+
+% \subsection*{Initial Conditions Summary}
+
+% \begin{table}[H]
+% \centering
+% \caption{Initial conditions for both models (at t = 0, corresponding to 5:00 AM)}
+% \begin{tabular}{@{}lcc@{}}
+% \toprule
+% Species & Model 1 (ppm) & Model 2 (ppm) \\ \midrule
+% NO & 0.100 & 0.100 \\
+% NO$_2$ & 0.050 & 0.050 \\
+% O$_3$ & 0.0 & 0.0 \\
+% O & 0.0 & 0.0 \\
+% CO & — & 0.100 \\
+% HCHO & — & 0.010 \\
+% ALK & — & 1.000 \\
+% OLE & — & 0.200 \\
+% OH & — & 0.0 \\
+% HO$_2$ & — & 0.0 \\
+% RO$_2$ & — & 0.0 \\
+% \midrule
+% \textbf{Total ODEs} & \textbf{4} & \textbf{11} \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+% \subsection*{Numerical Solution Method}
+
+% Both models are solved using the LSODA algorithm (Livermore Solver for Ordinary Differential Equations with Automatic method switching) implemented in Python's \texttt{scipy.integrate.odeint}. 
+
+% \textbf{Key features:}
+% \begin{itemize}
+%     \item Automatically switches between non-stiff (Adams) and stiff (BDF) methods
+%     \item Adaptive time-stepping based on local error estimates
+%     \item Relative tolerance: $10^{-6}$
+%     \item Absolute tolerance: $10^{-8}$ (Model 2)
+%     \item Time span: 19 hours (5:00 AM to midnight)
+%     \item Time points: 2000 (for smooth visualization)
+% \end{itemize}
+
+% The system is stiff due to vastly different reaction timescales:
+% \begin{itemize}
+%     \item Fast: O + O$_2$ $\rightarrow$ O$_3$ (k$_2$ large), radical reactions (k$_{12}$, k$_{13}$ $\sim 10^5$)
+%     \item Slow: Photolysis (k$_1$, k$_4$, k$_7$ $\sim 0.1-30$ h$^{-1}$)
+%     \item Stiffness ratio: $\sim 10^7$
+% \end{itemize}
+
+% \subsection*{Conservation Properties}
+
+% \subsubsection*{Nitrogen Conservation (Model 1)}
+
+% Total nitrogen is conserved (excluding emissions):
+% \begin{equation}
+% \frac{d}{dt}\left([\text{NO}] + [\text{NO}_2]\right) = E_{\text{NO}} + E_{\text{NO}_2}
+% \end{equation}
+
+% This can be verified by summing Equations \ref{eq:m1_NO} and \ref{eq:m1_NO2}; all reaction terms cancel.
+
+% \subsubsection*{Odd Oxygen Conservation (Model 1)}
+
+% The sum of odd oxygen species (O$_x$ = O$_3$ + O + NO$_2$) changes only due to photolysis and NO$_x$ emissions:
+% \begin{equation}
+% \frac{d[\text{O}_x]}{dt} = k_1[\text{NO}_2] + E_{\text{NO}_2}
+% \end{equation}
+
+% \subsubsection*{Radical Balance (Model 2)}
+
+% Total reactive radicals (OH + HO$_2$ + RO$_2$) are produced by photolysis (R$_4$, R$_7$) and VOC oxidation, and consumed by termination reactions (R$_{14}$) and HNO$_3$ formation (R$_{15}$):
+
+% \begin{equation}
+% \frac{d[\text{Radicals}_{\text{total}}]}{dt} = 2k_4[\text{O}_3] + 2k_7[\text{HCHO}] - 2k_{14}[\text{HO}_2]^2 - k_{15}[\text{OH}][\text{NO}_2]
+% \end{equation}
+
+% During daytime, production dominates; at night, termination drives radical concentrations to near-zero.
+
+% \subsection*{Dimensionless Analysis}
+
+% To understand characteristic timescales, we can non-dimensionalize the equations. Define:
+
+% \begin{align}
+% \tau_{\text{photolysis}} &= \frac{1}{k_1} \sim 2 \text{ minutes} \\
+% \tau_{\text{titration}} &= \frac{1}{k_3[\text{O}_3]_{\text{typical}}} \sim 1 \text{ second (for O}_3 = 0.05 \text{ ppm)} \\
+% \tau_{\text{radical}} &= \frac{1}{k_{12}[\text{NO}]_{\text{typical}}} \sim 0.1 \text{ seconds (for NO} = 0.01 \text{ ppm)}
+% \end{align}
+
+% The wide range of timescales ($10^{-1}$ s to $10^3$ s) confirms the stiffness of the system and necessitates adaptive numerical methods.
+
+% \subsection*{Summary}
+
+% This appendix provides the complete mathematical formulation for both models:
+
+% \begin{itemize}
+%     \item \textbf{Model 1:} 4 ODEs (Eqs. \ref{eq:m1_NO}–\ref{eq:m1_O}), 5 reactions, suitable for educational purposes and demonstrating photostationary state
+    
+%     \item \textbf{Model 2:} 11 ODEs (Eqs. \ref{eq:m2_NO}–\ref{eq:m2_RO2}), 15 reactions, captures essential VOC chemistry and net ozone production
+% \end{itemize}
+
+% All equations are implemented numerically in Python using the \texttt{odeint} solver with appropriate stiffness handling. The formulation follows standard atmospheric chemistry conventions and is consistent with the literature.
