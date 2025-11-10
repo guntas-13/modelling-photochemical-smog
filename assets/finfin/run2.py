@@ -17,7 +17,6 @@ plt.style.use('seaborn-v0_8-whitegrid')
 plt.rcParams['figure.dpi'] = 100
 plt.rcParams['savefig.dpi'] = 300
 plt.rcParams['font.size'] = 13
-plt.rcParams['font.family'] = 'serif'
 plt.rcParams['axes.labelsize'] = 12
 plt.rcParams['axes.titlesize'] = 14
 plt.rcParams['xtick.labelsize'] = 11
