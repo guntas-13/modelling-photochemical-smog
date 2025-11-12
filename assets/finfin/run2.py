@@ -94,7 +94,7 @@ def model1_odes_1(y, t):
     NO, NO2, O3 = y
     
     # Time-dependent photolysis rate
-    k1 = solar_intensity(t)
+    k1 = k1_photolysis(t)
     
     # Differential equations
     dNO_dt = k1 * NO2 - k3 * NO * O3 + E_NO_m1
