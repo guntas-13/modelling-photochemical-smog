@@ -7,7 +7,8 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-from matplotlib.animation import FuncAnimation, PillowWriter
+from matplotlib.animation import FuncAnimation, PillowWriter, FFMpegWriter
+import shutil
 import sys
 import os
 
@@ -30,6 +31,14 @@ plt.rcParams['xtick.labelsize'] = 9
 plt.rcParams['ytick.labelsize'] = 9
 plt.rcParams['legend.fontsize'] = 9
 plt.rcParams['figure.titlesize'] = 13
+
+# Save high-quality MP4s when possible
+SAVE_MP4 = True
+ffmpeg_path = shutil.which('ffmpeg')
+ffmpeg_available = ffmpeg_path is not None
+if SAVE_MP4 and not ffmpeg_available:
+    print('\nWARNING: ffmpeg not found in PATH. MP4 exports will be skipped.')
+    print('Install ffmpeg (e.g. `brew install ffmpeg`) to enable high-quality MP4 output.\n')
 
 # Colors
 COLORS = {
@@ -301,9 +310,16 @@ fps = 20
 
 anim1 = FuncAnimation(fig1, animate1, frames=num_frames, interval=1000/fps, blit=True, repeat=True)
 writer1 = PillowWriter(fps=fps)
-anim1.save('model1_results.gif', writer=writer1, dpi=100)
+anim1.save('model1_results.gif', writer=writer1, dpi=300)
 print(f"✓ Saved: model1_results.gif ({os.path.getsize('model1_results.gif') / (1024*1024):.2f} MB)")
 plt.close(fig1)
+if SAVE_MP4 and ffmpeg_available:
+    try:
+        mp4_writer = FFMpegWriter(fps=fps, metadata={'artist': 'animate_all_models'}, bitrate=8000)
+        anim1.save('model1_results.mp4', writer=mp4_writer, dpi=300)
+        print(f"✓ Saved: model1_results.mp4 ({os.path.getsize('model1_results.mp4') / (1024*1024):.2f} MB)")
+    except Exception as e:
+        print(f"Failed to save model1_results.mp4: {e}")
 
 # ============================================================================
 # ANIMATION 2: model1_results_1.gif
@@ -383,9 +399,16 @@ def animate2(frame):
 
 anim2 = FuncAnimation(fig2, animate2, frames=num_frames, interval=1000/fps, blit=True, repeat=True)
 writer2 = PillowWriter(fps=fps)
-anim2.save('model1_results_1.gif', writer=writer2, dpi=100)
+anim2.save('model1_results_1.gif', writer=writer2, dpi=300)
 print(f"✓ Saved: model1_results_1.gif ({os.path.getsize('model1_results_1.gif') / (1024*1024):.2f} MB)")
 plt.close(fig2)
+if SAVE_MP4 and ffmpeg_available:
+    try:
+        mp4_writer = FFMpegWriter(fps=fps, metadata={'artist': 'animate_all_models'}, bitrate=8000)
+        anim2.save('model1_results_1.mp4', writer=mp4_writer, dpi=300)
+        print(f"✓ Saved: model1_results_1.mp4 ({os.path.getsize('model1_results_1.mp4') / (1024*1024):.2f} MB)")
+    except Exception as e:
+        print(f"Failed to save model1_results_1.mp4: {e}")
 
 # ============================================================================
 # ANIMATION 3: model2_results.gif
@@ -529,9 +552,16 @@ def animate3(frame):
 
 anim3 = FuncAnimation(fig3, animate3, frames=num_frames, interval=1000/fps, blit=True, repeat=True)
 writer3 = PillowWriter(fps=fps)
-anim3.save('model2_results.gif', writer=writer3, dpi=100)
+anim3.save('model2_results.gif', writer=writer3, dpi=300)
 print(f"✓ Saved: model2_results.gif ({os.path.getsize('model2_results.gif') / (1024*1024):.2f} MB)")
 plt.close(fig3)
+if SAVE_MP4 and ffmpeg_available:
+    try:
+        mp4_writer = FFMpegWriter(fps=fps, metadata={'artist': 'animate_all_models'}, bitrate=12000)
+        anim3.save('model2_results.mp4', writer=mp4_writer, dpi=300)
+        print(f"✓ Saved: model2_results.mp4 ({os.path.getsize('model2_results.mp4') / (1024*1024):.2f} MB)")
+    except Exception as e:
+        print(f"Failed to save model2_results.mp4: {e}")
 
 # ============================================================================
 # ANIMATION 4: comparison_models.gif
@@ -601,9 +631,16 @@ def animate4(frame):
 
 anim4 = FuncAnimation(fig4, animate4, frames=num_frames, interval=1000/fps, blit=True, repeat=True)
 writer4 = PillowWriter(fps=fps)
-anim4.save('comparison_models.gif', writer=writer4, dpi=100)
+anim4.save('comparison_models.gif', writer=writer4, dpi=300)
 print(f"✓ Saved: comparison_models.gif ({os.path.getsize('comparison_models.gif') / (1024*1024):.2f} MB)")
 plt.close(fig4)
+if SAVE_MP4 and ffmpeg_available:
+    try:
+        mp4_writer = FFMpegWriter(fps=fps, metadata={'artist': 'animate_all_models'}, bitrate=8000)
+        anim4.save('comparison_models.mp4', writer=mp4_writer, dpi=300)
+        print(f"✓ Saved: comparison_models.mp4 ({os.path.getsize('comparison_models.mp4') / (1024*1024):.2f} MB)")
+    except Exception as e:
+        print(f"Failed to save comparison_models.mp4: {e}")
 
 # ============================================================================
 # SUMMARY
