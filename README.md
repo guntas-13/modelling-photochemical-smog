@@ -1,4 +1,5 @@
-# Modelling of Earth System and Sustainability
+# Modelling of Photochemical Smog
+## EH605: Modelling of Earth System and Sustainability
 
 ![](./assets/anims/model1_results_1.gif)
 
